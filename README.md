@@ -74,6 +74,13 @@ NYCRealEstateAI/
 - **Assessed Value Ratio**: Market price vs NYC DOF assessment
 - **Appreciation Analysis**: Track price changes since last sale (ACRIS data)
 
+### Year-over-Year Comparable Sales ⭐ **NEW**
+- **YoY Trend Flags**: Automatic Rising/Declining/Stable classification
+- **Comparable Matching**: 5-10 recent sales from same building/neighborhood
+- **Negotiation Insights**: Data-driven offer strategies based on market trends
+- **Value vs Comps**: Instant pricing assessment (Underpriced/Fair/Overpriced)
+- **DOF Rolling Sales**: Monthly updated comp data from NYC Department of Finance
+
 ### Intelligent Ranking
 Properties scored on a 0-100 scale considering:
 - **Price Match** (40 pts): How close to buyer's budget
@@ -141,11 +148,13 @@ All data sources are free and publicly available.
 ## Documentation
 
 - [Airtable Schema](schemas/airtable-schema.json)
-- [Investment Metrics Guide](docs/INVESTMENT_METRICS.md) ⭐ **NEW**
+- [Investment Metrics Guide](docs/INVESTMENT_METRICS.md)
+- [YoY Comps Analysis](docs/YOY_ANALYSIS.md) ⭐ **NEW**
 - [Implementation Guide](docs/IMPLEMENTATION.md)
 - [Formula Reference](docs/FORMULAS.md)
 - [OpenAI Parser](docs/OPENAI_PARSER.md)
 - [UI/UX Design](docs/UI_UX_DESIGN.md)
+- [Comps UI Components](docs/COMPS_UI.md) ⭐ **NEW**
 
 ## License
 

@@ -1,0 +1,342 @@
+{
+  "table_name": "ComparableSales",
+  "description": "Comparable sales records for YoY valuation analysis. Links to Properties for trend tracking.",
+  "fields": [
+    {
+      "name": "CompID",
+      "type": "autonumber",
+      "description": "Auto-generated unique identifier",
+      "primary_key": true
+    },
+    {
+      "name": "BBL",
+      "type": "single_line_text",
+      "description": "NYC Borough-Block-Lot number (10-digit identifier from ACRIS/DOF)",
+      "required": true
+    },
+    {
+      "name": "Address",
+      "type": "single_line_text",
+      "description": "Full property address",
+      "required": true
+    },
+    {
+      "name": "BuildingName",
+      "type": "single_line_text",
+      "description": "Building name if applicable (e.g., '4610 Center Boulevard')"
+    },
+    {
+      "name": "UnitNumber",
+      "type": "single_line_text",
+      "description": "Apartment/unit number"
+    },
+    {
+      "name": "Bedrooms",
+      "type": "number",
+      "format": "integer",
+      "description": "Number of bedrooms"
+    },
+    {
+      "name": "Bathrooms",
+      "type": "number",
+      "format": "decimal",
+      "description": "Number of bathrooms"
+    },
+    {
+      "name": "SQFT",
+      "type": "number",
+      "format": "integer",
+      "description": "Square footage",
+      "required": true
+    },
+    {
+      "name": "SaleDate",
+      "type": "date",
+      "description": "Date of sale closing",
+      "required": true
+    },
+    {
+      "name": "SalePrice",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Recorded sale price",
+      "required": true
+    },
+    {
+      "name": "PPSF",
+      "type": "formula",
+      "formula": "IF(SQFT > 0, ROUND(SalePrice / SQFT, 2), 0)",
+      "return_type": "currency",
+      "description": "Price per square foot"
+    },
+    {
+      "name": "PriorYearSalePrice",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Sale price from 1 year prior (from linked comp or ACRIS lookup)"
+    },
+    {
+      "name": "PriorYearPPSF",
+      "type": "formula",
+      "formula": "IF(SQFT > 0, ROUND(PriorYearSalePrice / SQFT, 2), 0)",
+      "return_type": "currency",
+      "description": "PPSF from 1 year ago"
+    },
+    {
+      "name": "YoY_PPSF_Change",
+      "type": "formula",
+      "formula": "IF(PriorYearPPSF > 0, ROUND((PPSF - PriorYearPPSF) / PriorYearPPSF * 100, 2), 0)",
+      "return_type": "percent",
+      "description": "Year-over-year PPSF percentage change"
+    },
+    {
+      "name": "YoY_Price_Change",
+      "type": "formula",
+      "formula": "IF(PriorYearSalePrice > 0, ROUND((SalePrice - PriorYearSalePrice) / PriorYearSalePrice * 100, 2), 0)",
+      "return_type": "percent",
+      "description": "Year-over-year total price percentage change"
+    },
+    {
+      "name": "PropertyLink",
+      "type": "link_to_record",
+      "linked_table": "Properties",
+      "description": "Link to current listing if applicable"
+    },
+    {
+      "name": "Neighborhood",
+      "type": "link_to_record",
+      "linked_table": "Neighborhoods",
+      "description": "Link to neighborhood"
+    },
+    {
+      "name": "Borough",
+      "type": "single_select",
+      "options": ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"],
+      "description": "NYC borough"
+    },
+    {
+      "name": "ZipCode",
+      "type": "single_line_text",
+      "description": "5-digit zip code"
+    },
+    {
+      "name": "DocumentID",
+      "type": "single_line_text",
+      "description": "ACRIS document control number"
+    },
+    {
+      "name": "SaleType",
+      "type": "single_select",
+      "options": ["Arms Length", "Family Transfer", "New Development", "Bulk Sale", "Unknown"],
+      "description": "Type of transaction (filter for arms-length only)"
+    },
+    {
+      "name": "DataSource",
+      "type": "single_select",
+      "options": ["DOF Rolling Sales", "ACRIS", "Manual", "StreetEasy"],
+      "description": "Where comp data originated"
+    },
+    {
+      "name": "CompQuality",
+      "type": "single_select",
+      "options": ["Excellent", "Good", "Fair", "Poor"],
+      "description": "How well this comp matches (same building=Excellent, same zip=Fair)"
+    },
+    {
+      "name": "FloorNumber",
+      "type": "number",
+      "format": "integer",
+      "description": "Floor number if known"
+    },
+    {
+      "name": "DateAdded",
+      "type": "created_time",
+      "description": "When comp was added to database"
+    },
+    {
+      "name": "Notes",
+      "type": "long_text",
+      "description": "Additional context about this comp"
+    }
+  ],
+  "properties_table_additions": [
+    {
+      "name": "ComparableSales",
+      "type": "link_to_record",
+      "linked_table": "ComparableSales",
+      "allow_multiple": true,
+      "description": "Linked comparable sales for this property"
+    },
+    {
+      "name": "CompsCount",
+      "type": "rollup",
+      "linked_field": "ComparableSales",
+      "rollup_field": "CompID",
+      "aggregation": "COUNTA",
+      "description": "Number of comps found (need >3 for validity)"
+    },
+    {
+      "name": "AvgCompsYoY_PPSF",
+      "type": "rollup",
+      "linked_field": "ComparableSales",
+      "rollup_field": "YoY_PPSF_Change",
+      "aggregation": "AVERAGE",
+      "description": "Average YoY PPSF change from all comps"
+    },
+    {
+      "name": "MedianCompsPPSF",
+      "type": "rollup",
+      "linked_field": "ComparableSales",
+      "rollup_field": "PPSF",
+      "aggregation": "MEDIAN",
+      "description": "Median PPSF of comparable sales"
+    },
+    {
+      "name": "YoYTrendFlag",
+      "type": "formula",
+      "formula": "IF(CompsCount < 3, 'Insufficient Data', IF(AvgCompsYoY_PPSF > 5, 'Rising', IF(AvgCompsYoY_PPSF < -5, 'Declining', 'Stable')))",
+      "return_type": "single_select",
+      "description": "Market trend based on comps: Rising >5%, Declining <-5%, Stable"
+    },
+    {
+      "name": "CompsPriceVariance",
+      "type": "formula",
+      "formula": "IF(AND(MedianCompsPPSF > 0, PricePerSQFT > 0), ROUND((PricePerSQFT - MedianCompsPPSF) / MedianCompsPPSF * 100, 2), 0)",
+      "return_type": "percent",
+      "description": "How current listing PPSF compares to comps median"
+    },
+    {
+      "name": "ValueVsComps",
+      "type": "formula",
+      "formula": "IF(CompsPriceVariance < -10, 'Underpriced', IF(CompsPriceVariance > 10, 'Overpriced', 'Fair'))",
+      "return_type": "single_select",
+      "description": "Value assessment vs comparable sales"
+    }
+  ],
+  "new_views": [
+    {
+      "table": "ComparableSales",
+      "name": "All Comps",
+      "type": "grid",
+      "sort": [{"field": "SaleDate", "direction": "desc"}],
+      "description": "All comparable sales records"
+    },
+    {
+      "table": "ComparableSales",
+      "name": "Recent 12 Months",
+      "type": "grid",
+      "filter": "IS_AFTER(SaleDate, DATEADD(TODAY(), -12, 'months'))",
+      "sort": [{"field": "SaleDate", "direction": "desc"}],
+      "description": "Sales from last 12 months only"
+    },
+    {
+      "table": "ComparableSales",
+      "name": "Positive YoY",
+      "type": "grid",
+      "filter": "YoY_PPSF_Change > 0",
+      "sort": [{"field": "YoY_PPSF_Change", "direction": "desc"}],
+      "description": "Comps showing price appreciation"
+    },
+    {
+      "table": "ComparableSales",
+      "name": "Negative YoY",
+      "type": "grid",
+      "filter": "YoY_PPSF_Change < 0",
+      "sort": [{"field": "YoY_PPSF_Change", "direction": "asc"}],
+      "description": "Comps showing price decline"
+    },
+    {
+      "table": "Properties",
+      "name": "YoY Declining Comps",
+      "type": "grid",
+      "filter": "AND(AvgCompsYoY_PPSF < -2, CompsCount >= 3, Status = 'Active')",
+      "sort": [{"field": "AvgCompsYoY_PPSF", "direction": "asc"}],
+      "description": "Properties with declining comp trends (negotiation opportunities)"
+    },
+    {
+      "table": "Properties",
+      "name": "Rising Market Buildings",
+      "type": "grid",
+      "filter": "AND(AvgCompsYoY_PPSF > 5, CompsCount >= 3, Status = 'Active')",
+      "sort": [{"field": "AvgCompsYoY_PPSF", "direction": "desc"}],
+      "description": "Properties in hot markets with rising comps"
+    },
+    {
+      "table": "Properties",
+      "name": "Underpriced vs Comps",
+      "type": "grid",
+      "filter": "AND(ValueVsComps = 'Underpriced', CompsCount >= 3, Status = 'Active')",
+      "sort": [{"field": "CompsPriceVariance", "direction": "asc"}],
+      "description": "Listings priced 10%+ below recent comps"
+    }
+  ],
+  "comp_matching_criteria": {
+    "priority_1_same_building": {
+      "description": "Best comps - same building address",
+      "quality": "Excellent",
+      "filters": [
+        "Same building address (BBL first 6 digits match)",
+        "Beds within ±1",
+        "SQFT within ±20%",
+        "Sale within last 24 months"
+      ]
+    },
+    "priority_2_nearby": {
+      "description": "Good comps - same block or adjacent",
+      "quality": "Good",
+      "filters": [
+        "Same zip code",
+        "Same beds",
+        "SQFT within ±15%",
+        "Sale within last 18 months"
+      ]
+    },
+    "priority_3_neighborhood": {
+      "description": "Fair comps - same neighborhood",
+      "quality": "Fair",
+      "filters": [
+        "Same neighborhood",
+        "Beds within ±1",
+        "SQFT within ±25%",
+        "Sale within last 12 months"
+      ]
+    }
+  },
+  "yoy_calculation_method": {
+    "description": "How to calculate year-over-year change for each comp",
+    "steps": [
+      "1. For each comp sale (Sale A), find prior year sale of same/similar unit",
+      "2. Query ACRIS for sales at same BBL 12-18 months before Sale A",
+      "3. If exact unit match found, use that as prior year baseline",
+      "4. If no exact match, use median PPSF of similar units in building from prior year",
+      "5. Calculate: (Current PPSF - Prior PPSF) / Prior PPSF × 100",
+      "6. Aggregate: Average all comp YoY values for property's AvgCompsYoY_PPSF"
+    ],
+    "example": {
+      "comp_address": "4610 Center Blvd #12B",
+      "sale_date": "2024-12-15",
+      "sale_price": 1650000,
+      "sqft": 1200,
+      "ppsf": 1375,
+      "prior_year_sale_date": "2023-11-20",
+      "prior_year_price": 1550000,
+      "prior_year_ppsf": 1292,
+      "yoy_change": "+6.4%",
+      "calculation": "(1375 - 1292) / 1292 * 100 = 6.4%"
+    }
+  },
+  "data_quality_rules": {
+    "exclude_sales": [
+      "Sale price < $100,000 (likely non-arms-length)",
+      "Sale price > $50,000,000 (outlier)",
+      "PPSF < $200 or > $5,000 (data error)",
+      "Sale type = 'Family Transfer' or 'Bulk Sale'",
+      "New development first sales (use 2nd sale onwards)"
+    ],
+    "minimum_comps": 3,
+    "ideal_comps": "5-10 per property",
+    "max_age": "24 months for comp validity"
+  }
+}
