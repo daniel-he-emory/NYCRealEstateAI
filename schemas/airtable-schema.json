@@ -1,0 +1,609 @@
+{
+  "base_name": "NYC Real Estate AI",
+  "tables": [
+    {
+      "name": "Properties",
+      "description": "Main table storing all property listings with comprehensive details and calculated metrics",
+      "fields": [
+        {
+          "name": "PropertyID",
+          "type": "autonumber",
+          "description": "Auto-generated unique identifier",
+          "primary_key": true
+        },
+        {
+          "name": "Address",
+          "type": "single_line_text",
+          "description": "Full property address",
+          "required": true
+        },
+        {
+          "name": "Neighborhood",
+          "type": "link_to_record",
+          "linked_table": "Neighborhoods",
+          "description": "Link to neighborhood data"
+        },
+        {
+          "name": "ListingURL",
+          "type": "url",
+          "description": "Link to original listing (StreetEasy, Zillow, etc)"
+        },
+        {
+          "name": "CurrentPrice",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Current asking price",
+          "required": true
+        },
+        {
+          "name": "OriginalPrice",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Original listing price"
+        },
+        {
+          "name": "PriceHistory",
+          "type": "long_text",
+          "description": "JSON array of price changes: [{date: '2024-01-15', price: 1800000}, ...]"
+        },
+        {
+          "name": "PriceCutCount",
+          "type": "formula",
+          "formula": "IF(PriceHistory, LEN(PriceHistory) - LEN(SUBSTITUTE(PriceHistory, '},{', '}')), 0)",
+          "return_type": "number",
+          "description": "Number of times price has been reduced"
+        },
+        {
+          "name": "TotalCutPercent",
+          "type": "formula",
+          "formula": "IF(AND(OriginalPrice > 0, CurrentPrice > 0), ROUND((OriginalPrice - CurrentPrice) / OriginalPrice * 100, 2), 0)",
+          "return_type": "percent",
+          "description": "Total percentage price reduction from original"
+        },
+        {
+          "name": "DaysOnMarket",
+          "type": "number",
+          "description": "Number of days since listing",
+          "format": "integer"
+        },
+        {
+          "name": "Bedrooms",
+          "type": "number",
+          "description": "Number of bedrooms",
+          "format": "integer"
+        },
+        {
+          "name": "Bathrooms",
+          "type": "number",
+          "description": "Number of bathrooms",
+          "format": "decimal"
+        },
+        {
+          "name": "SQFT",
+          "type": "number",
+          "description": "Total square footage",
+          "format": "integer"
+        },
+        {
+          "name": "PricePerSQFT",
+          "type": "formula",
+          "formula": "IF(SQFT > 0, ROUND(CurrentPrice / SQFT, 2), 0)",
+          "return_type": "currency",
+          "description": "Price per square foot"
+        },
+        {
+          "name": "MonthlyHOA",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Monthly HOA/maintenance fees"
+        },
+        {
+          "name": "HOAPercentOfPrice",
+          "type": "formula",
+          "formula": "IF(CurrentPrice > 0, ROUND((MonthlyHOA * 12) / CurrentPrice * 100, 2), 0)",
+          "return_type": "percent",
+          "description": "Annual HOA cost as percentage of property price"
+        },
+        {
+          "name": "EstimatedMonthlyRent",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Estimated market rent for this property"
+        },
+        {
+          "name": "AnnualRent",
+          "type": "formula",
+          "formula": "EstimatedMonthlyRent * 12",
+          "return_type": "currency",
+          "description": "Annual rental income potential"
+        },
+        {
+          "name": "RentToPriceRatio",
+          "type": "formula",
+          "formula": "IF(CurrentPrice > 0, ROUND((EstimatedMonthlyRent * 12) / CurrentPrice * 100, 2), 0)",
+          "return_type": "percent",
+          "description": "Annual rent as % of price (cap rate proxy)"
+        },
+        {
+          "name": "HasElevator",
+          "type": "checkbox",
+          "description": "Building has elevator"
+        },
+        {
+          "name": "HasDoorman",
+          "type": "checkbox",
+          "description": "Building has doorman/concierge"
+        },
+        {
+          "name": "HasParking",
+          "type": "checkbox",
+          "description": "Parking available"
+        },
+        {
+          "name": "HasGym",
+          "type": "checkbox",
+          "description": "Building has gym/fitness center"
+        },
+        {
+          "name": "HasRoofDeck",
+          "type": "checkbox",
+          "description": "Building has roof deck/terrace"
+        },
+        {
+          "name": "PetFriendly",
+          "type": "checkbox",
+          "description": "Pets allowed"
+        },
+        {
+          "name": "Exposure",
+          "type": "single_select",
+          "options": ["North", "South", "East", "West", "Corner", "Multiple", "Unknown"],
+          "description": "Unit exposure/light direction"
+        },
+        {
+          "name": "FloorLevel",
+          "type": "single_select",
+          "options": ["Low (1-5)", "Mid (6-15)", "High (16-30)", "Penthouse (31+)", "Unknown"],
+          "description": "Floor level category"
+        },
+        {
+          "name": "FloorNumber",
+          "type": "number",
+          "description": "Exact floor number",
+          "format": "integer"
+        },
+        {
+          "name": "SubwayDistance",
+          "type": "number",
+          "description": "Walking time to nearest subway (minutes)",
+          "format": "integer"
+        },
+        {
+          "name": "NearestSubwayLines",
+          "type": "single_line_text",
+          "description": "Subway lines accessible (e.g., '7, E, M')"
+        },
+        {
+          "name": "YearBuilt",
+          "type": "number",
+          "description": "Year building was constructed",
+          "format": "integer"
+        },
+        {
+          "name": "BuildingAge",
+          "type": "formula",
+          "formula": "YEAR(TODAY()) - YearBuilt",
+          "return_type": "number",
+          "description": "Age of building in years"
+        },
+        {
+          "name": "LastSaleDate",
+          "type": "date",
+          "description": "Date of last recorded sale (ACRIS)"
+        },
+        {
+          "name": "LastSalePrice",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Last sale price from ACRIS records"
+        },
+        {
+          "name": "AppreciationSinceLastSale",
+          "type": "formula",
+          "formula": "IF(AND(LastSalePrice > 0, CurrentPrice > 0), ROUND((CurrentPrice - LastSalePrice) / LastSalePrice * 100, 2), 0)",
+          "return_type": "percent",
+          "description": "Price change since last sale"
+        },
+        {
+          "name": "ACRISRecordID",
+          "type": "single_line_text",
+          "description": "NYC ACRIS document ID for last sale"
+        },
+        {
+          "name": "DistressFlag",
+          "type": "formula",
+          "formula": "IF(AND(TotalCutPercent >= 10, PriceCutCount >= 2, DaysOnMarket >= 60), 'High', IF(OR(TotalCutPercent >= 5, PriceCutCount >= 1, DaysOnMarket >= 45), 'Medium', 'Low'))",
+          "return_type": "single_select",
+          "description": "Seller motivation indicator based on price cuts and days on market"
+        },
+        {
+          "name": "BuyerFitScore",
+          "type": "number",
+          "description": "Calculated match score (0-100) - computed via automation",
+          "format": "decimal"
+        },
+        {
+          "name": "PropertyDescription",
+          "type": "long_text",
+          "description": "Full listing description"
+        },
+        {
+          "name": "PropertyTags",
+          "type": "multiple_select",
+          "options": ["Waterfront", "Renovated", "Prewar", "New Construction", "Loft", "View", "Outdoor Space", "In-Unit Laundry", "Storage"],
+          "description": "Categorical tags for filtering"
+        },
+        {
+          "name": "DateAdded",
+          "type": "created_time",
+          "description": "When record was created in Airtable"
+        },
+        {
+          "name": "LastUpdated",
+          "type": "last_modified_time",
+          "description": "Last time record was modified"
+        },
+        {
+          "name": "DataSource",
+          "type": "single_select",
+          "options": ["StreetEasy", "Zillow", "Realtor.com", "Manual", "API"],
+          "description": "Where property data originated"
+        },
+        {
+          "name": "Status",
+          "type": "single_select",
+          "options": ["Active", "In Contract", "Sold", "Delisted", "Price Change"],
+          "description": "Current listing status"
+        }
+      ]
+    },
+    {
+      "name": "Neighborhoods",
+      "description": "Neighborhood-level market data and statistics",
+      "fields": [
+        {
+          "name": "NeighborhoodName",
+          "type": "single_line_text",
+          "description": "Name of neighborhood",
+          "primary_key": true,
+          "required": true
+        },
+        {
+          "name": "Borough",
+          "type": "single_select",
+          "options": ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"],
+          "description": "NYC borough"
+        },
+        {
+          "name": "MedianPrice",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Median condo sale price"
+        },
+        {
+          "name": "MedianPricePerSQFT",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Median price per square foot"
+        },
+        {
+          "name": "MedianRent",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Median monthly rent for comparable units"
+        },
+        {
+          "name": "RentToPriceRatio",
+          "type": "formula",
+          "formula": "IF(MedianPrice > 0, ROUND((MedianRent * 12) / MedianPrice * 100, 2), 0)",
+          "return_type": "percent",
+          "description": "Neighborhood average rent-to-price ratio"
+        },
+        {
+          "name": "AvgDaysOnMarket",
+          "type": "number",
+          "description": "Average days properties stay listed",
+          "format": "integer"
+        },
+        {
+          "name": "PriceChangeYoY",
+          "type": "percent",
+          "description": "Year-over-year price change percentage"
+        },
+        {
+          "name": "TotalListings",
+          "type": "rollup",
+          "linked_field": "Neighborhood",
+          "rollup_field": "PropertyID",
+          "aggregation": "COUNTA",
+          "description": "Count of properties in this neighborhood"
+        },
+        {
+          "name": "AvgSubwayAccess",
+          "type": "number",
+          "description": "Average minutes to nearest subway",
+          "format": "integer"
+        },
+        {
+          "name": "WalkScore",
+          "type": "number",
+          "description": "Walk Score (0-100)",
+          "format": "integer"
+        },
+        {
+          "name": "TransitScore",
+          "type": "number",
+          "description": "Transit Score (0-100)",
+          "format": "integer"
+        },
+        {
+          "name": "NeighborhoodNotes",
+          "type": "long_text",
+          "description": "Characteristics, trends, buyer appeal notes"
+        }
+      ]
+    },
+    {
+      "name": "HistoricalSales",
+      "description": "NYC ACRIS sales records for comparable analysis",
+      "fields": [
+        {
+          "name": "DocumentID",
+          "type": "single_line_text",
+          "description": "ACRIS document control number",
+          "primary_key": true
+        },
+        {
+          "name": "RecordedDate",
+          "type": "date",
+          "description": "Date sale was recorded"
+        },
+        {
+          "name": "Address",
+          "type": "single_line_text",
+          "description": "Property address"
+        },
+        {
+          "name": "Borough",
+          "type": "single_select",
+          "options": ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"],
+          "description": "NYC borough"
+        },
+        {
+          "name": "Neighborhood",
+          "type": "link_to_record",
+          "linked_table": "Neighborhoods",
+          "description": "Link to neighborhood"
+        },
+        {
+          "name": "SalePrice",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Recorded sale price"
+        },
+        {
+          "name": "PropertyType",
+          "type": "single_select",
+          "options": ["Condo", "Co-op", "Townhouse", "Multi-family", "Other"],
+          "description": "Type of property"
+        },
+        {
+          "name": "Bedrooms",
+          "type": "number",
+          "format": "integer"
+        },
+        {
+          "name": "SQFT",
+          "type": "number",
+          "format": "integer"
+        },
+        {
+          "name": "PricePerSQFT",
+          "type": "formula",
+          "formula": "IF(SQFT > 0, ROUND(SalePrice / SQFT, 2), 0)",
+          "return_type": "currency"
+        }
+      ]
+    },
+    {
+      "name": "MarketMetrics",
+      "description": "Time-series market data for trend analysis",
+      "fields": [
+        {
+          "name": "MetricID",
+          "type": "autonumber",
+          "primary_key": true
+        },
+        {
+          "name": "Date",
+          "type": "date",
+          "description": "Month/year of metric",
+          "required": true
+        },
+        {
+          "name": "Neighborhood",
+          "type": "link_to_record",
+          "linked_table": "Neighborhoods",
+          "description": "Neighborhood (or leave blank for citywide)"
+        },
+        {
+          "name": "AvgPricePerSQFT",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Average $/sqft for the period"
+        },
+        {
+          "name": "MedianSalePrice",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0,
+          "description": "Median sale price"
+        },
+        {
+          "name": "SalesVolume",
+          "type": "number",
+          "description": "Number of sales",
+          "format": "integer"
+        },
+        {
+          "name": "AvgDaysOnMarket",
+          "type": "number",
+          "description": "Average days to sale",
+          "format": "integer"
+        },
+        {
+          "name": "InventoryCount",
+          "type": "number",
+          "description": "Active listings",
+          "format": "integer"
+        }
+      ]
+    },
+    {
+      "name": "BuyerSearches",
+      "description": "Stores parsed buyer preferences from natural language input",
+      "fields": [
+        {
+          "name": "SearchID",
+          "type": "autonumber",
+          "primary_key": true
+        },
+        {
+          "name": "SearchDate",
+          "type": "created_time"
+        },
+        {
+          "name": "RawInput",
+          "type": "long_text",
+          "description": "Original natural language query"
+        },
+        {
+          "name": "ParsedCriteria",
+          "type": "long_text",
+          "description": "JSON output from OpenAI parser"
+        },
+        {
+          "name": "BedsMin",
+          "type": "number",
+          "format": "integer"
+        },
+        {
+          "name": "BedsMax",
+          "type": "number",
+          "format": "integer"
+        },
+        {
+          "name": "BathsMin",
+          "type": "number",
+          "format": "decimal"
+        },
+        {
+          "name": "PriceMin",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0
+        },
+        {
+          "name": "PriceMax",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0
+        },
+        {
+          "name": "RequiredAmenities",
+          "type": "multiple_select",
+          "options": ["Elevator", "Doorman", "Parking", "Gym", "Roof Deck", "Pet Friendly", "In-Unit Laundry"],
+          "description": "Must-have features"
+        },
+        {
+          "name": "PreferredNeighborhoods",
+          "type": "link_to_record",
+          "linked_table": "Neighborhoods",
+          "allow_multiple": true
+        },
+        {
+          "name": "MaxSubwayDistance",
+          "type": "number",
+          "description": "Max walk to subway (minutes)",
+          "format": "integer"
+        },
+        {
+          "name": "MaxHOAMonthly",
+          "type": "currency",
+          "currency": "USD",
+          "precision": 0
+        },
+        {
+          "name": "MatchedProperties",
+          "type": "link_to_record",
+          "linked_table": "Properties",
+          "allow_multiple": true,
+          "description": "Properties matching this search"
+        },
+        {
+          "name": "ResultsCount",
+          "type": "rollup",
+          "linked_field": "MatchedProperties",
+          "rollup_field": "PropertyID",
+          "aggregation": "COUNTA"
+        }
+      ]
+    }
+  ],
+  "views": [
+    {
+      "table": "Properties",
+      "name": "All Active Listings",
+      "type": "grid",
+      "filter": "Status = 'Active'",
+      "sort": [{"field": "BuyerFitScore", "direction": "desc"}]
+    },
+    {
+      "table": "Properties",
+      "name": "High Distress Signals",
+      "type": "grid",
+      "filter": "DistressFlag = 'High'",
+      "sort": [{"field": "TotalCutPercent", "direction": "desc"}]
+    },
+    {
+      "table": "Properties",
+      "name": "Best Value (Rent-to-Price)",
+      "type": "grid",
+      "filter": "RentToPriceRatio >= 4",
+      "sort": [{"field": "RentToPriceRatio", "direction": "desc"}]
+    },
+    {
+      "table": "Properties",
+      "name": "Recent Price Cuts",
+      "type": "grid",
+      "filter": "Status = 'Price Change'",
+      "sort": [{"field": "LastUpdated", "direction": "desc"}]
+    },
+    {
+      "table": "Neighborhoods",
+      "name": "Market Overview",
+      "type": "grid",
+      "sort": [{"field": "MedianPrice", "direction": "desc"}]
+    }
+  ]
+}

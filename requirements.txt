@@ -1,0 +1,21 @@
+# Core dependencies for NYC Real Estate AI
+
+# OpenAI API for natural language processing
+openai>=1.0.0
+
+# Airtable API client
+pyairtable>=2.1.0
+
+# Web scraping and HTTP requests
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+
+# Environment variable management
+python-dotenv>=1.0.0
+
+# Data manipulation (optional but useful)
+pandas>=2.0.0
+
+# For API development (if building custom backend)
+flask>=3.0.0
+flask-cors>=4.0.0

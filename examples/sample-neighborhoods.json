@@ -1,0 +1,80 @@
+[
+  {
+    "NeighborhoodName": "Long Island City",
+    "Borough": "Queens",
+    "MedianPrice": 1100000,
+    "MedianPricePerSQFT": 1180,
+    "MedianRent": 3800,
+    "AvgDaysOnMarket": 52,
+    "PriceChangeYoY": -3.5,
+    "AvgSubwayAccess": 7,
+    "WalkScore": 88,
+    "TransitScore": 92,
+    "NeighborhoodNotes": "Fast-growing neighborhood with new luxury condos, waterfront parks, and easy Manhattan access via 7/E/M trains. Popular with young professionals. Strong rental market. Slightly softening prices post-COVID."
+  },
+  {
+    "NeighborhoodName": "Hell's Kitchen",
+    "Borough": "Manhattan",
+    "MedianPrice": 1550000,
+    "MedianPricePerSQFT": 1425,
+    "MedianRent": 4500,
+    "AvgDaysOnMarket": 48,
+    "PriceChangeYoY": 1.2,
+    "AvgSubwayAccess": 4,
+    "WalkScore": 99,
+    "TransitScore": 100,
+    "NeighborhoodNotes": "Vibrant Midtown West neighborhood with excellent dining, nightlife, and transit access (A/C/E/1/2/3). Mix of new and older condos. Near Times Square and Hudson River Park. Strong for both owner-occupants and investors."
+  },
+  {
+    "NeighborhoodName": "DUMBO",
+    "Borough": "Brooklyn",
+    "MedianPrice": 1650000,
+    "MedianPricePerSQFT": 1550,
+    "MedianRent": 4800,
+    "AvgDaysOnMarket": 65,
+    "PriceChangeYoY": -2.1,
+    "AvgSubwayAccess": 5,
+    "WalkScore": 96,
+    "TransitScore": 95,
+    "NeighborhoodNotes": "Down Under the Manhattan Bridge Overpass - trendy waterfront neighborhood with cobblestone streets, art galleries, tech companies. Mix of converted lofts and new luxury condos. Brooklyn Bridge Park access. Premium pricing but slower sales recently."
+  },
+  {
+    "NeighborhoodName": "Financial District",
+    "Borough": "Manhattan",
+    "MedianPrice": 1425000,
+    "MedianPricePerSQFT": 1320,
+    "MedianRent": 4200,
+    "AvgDaysOnMarket": 58,
+    "PriceChangeYoY": -1.8,
+    "AvgSubwayAccess": 6,
+    "WalkScore": 97,
+    "TransitScore": 98,
+    "NeighborhoodNotes": "Historic financial center transforming into residential neighborhood. Many glass high-rises with amenities. Excellent for young finance professionals. Weekends can be quiet. Rent-to-price ratios slightly below Manhattan average."
+  },
+  {
+    "NeighborhoodName": "Upper West Side",
+    "Borough": "Manhattan",
+    "MedianPrice": 1750000,
+    "MedianPricePerSQFT": 1650,
+    "MedianRent": 4900,
+    "AvgDaysOnMarket": 71,
+    "PriceChangeYoY": 0.5,
+    "AvgSubwayAccess": 5,
+    "WalkScore": 99,
+    "TransitScore": 100,
+    "NeighborhoodNotes": "Classic NYC neighborhood with prewar buildings, tree-lined streets, cultural institutions (Lincoln Center, museums). Family-friendly with excellent schools. Central Park access. Stable market with affluent buyer base. Higher HOA fees typical for older buildings."
+  },
+  {
+    "NeighborhoodName": "Park Slope",
+    "Borough": "Brooklyn",
+    "MedianPrice": 1350000,
+    "MedianPricePerSQFT": 1280,
+    "MedianRent": 4000,
+    "AvgDaysOnMarket": 62,
+    "PriceChangeYoY": -0.8,
+    "AvgSubwayAccess": 7,
+    "WalkScore": 95,
+    "TransitScore": 91,
+    "NeighborhoodNotes": "Brownstone Brooklyn at its finest - family-oriented, tree-lined streets, Prospect Park access, great schools and restaurants. Mix of condos in converted brownstones and newer buildings. Strong demand from families. Prices holding steady."
+  }
+]
