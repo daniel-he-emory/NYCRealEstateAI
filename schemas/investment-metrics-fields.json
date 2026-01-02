@@ -1,0 +1,331 @@
+{
+  "new_properties_fields": [
+    {
+      "name": "EstimatedAnnualTaxes",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Annual property taxes (from PLUTO or estimated at 0.5-1.0% of price)"
+    },
+    {
+      "name": "EstimatedInsurance",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Annual property insurance (estimate $800-1500 for condos)"
+    },
+    {
+      "name": "EstimatedUtilities",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Annual utilities if owner-paid (estimate $1200-2400)"
+    },
+    {
+      "name": "PropertyManagementFee",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Annual management fee (8-10% of gross rent if using PM)"
+    },
+    {
+      "name": "TotalAnnualExpenses",
+      "type": "formula",
+      "formula": "(MonthlyHOA * 12) + EstimatedAnnualTaxes + EstimatedInsurance + EstimatedUtilities + PropertyManagementFee",
+      "return_type": "currency",
+      "description": "Total annual operating expenses"
+    },
+    {
+      "name": "NetOperatingIncome",
+      "type": "formula",
+      "formula": "AnnualRent - TotalAnnualExpenses",
+      "return_type": "currency",
+      "description": "NOI = Annual Gross Rent - Operating Expenses"
+    },
+    {
+      "name": "CapRate",
+      "type": "formula",
+      "formula": "IF(CurrentPrice > 0, ROUND(NetOperatingIncome / CurrentPrice * 100, 2), 0)",
+      "return_type": "percent",
+      "description": "Cap Rate = NOI / Price × 100. NYC condo benchmark: 3-5%"
+    },
+    {
+      "name": "GrossRentMultiplier",
+      "type": "formula",
+      "formula": "IF(AnnualRent > 0, ROUND(CurrentPrice / AnnualRent, 1), 0)",
+      "return_type": "number",
+      "description": "GRM = Price / Annual Rent. Ideal: 10-15x, lower = better value"
+    },
+    {
+      "name": "DownPayment",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Down payment amount (typically 20-25% for investment properties)"
+    },
+    {
+      "name": "LoanAmount",
+      "type": "formula",
+      "formula": "CurrentPrice - DownPayment",
+      "return_type": "currency",
+      "description": "Mortgage loan amount"
+    },
+    {
+      "name": "InterestRate",
+      "type": "percent",
+      "description": "Mortgage interest rate (annual %)"
+    },
+    {
+      "name": "LoanTermYears",
+      "type": "number",
+      "format": "integer",
+      "description": "Loan term in years (typically 30)"
+    },
+    {
+      "name": "MonthlyDebtService",
+      "type": "formula",
+      "formula": "IF(AND(LoanAmount > 0, InterestRate > 0, LoanTermYears > 0), LoanAmount * (InterestRate/12) * POWER(1 + InterestRate/12, LoanTermYears*12) / (POWER(1 + InterestRate/12, LoanTermYears*12) - 1), 0)",
+      "return_type": "currency",
+      "description": "Monthly mortgage payment (P&I only)"
+    },
+    {
+      "name": "AnnualDebtService",
+      "type": "formula",
+      "formula": "MonthlyDebtService * 12",
+      "return_type": "currency",
+      "description": "Annual mortgage payments"
+    },
+    {
+      "name": "AnnualCashFlow",
+      "type": "formula",
+      "formula": "NetOperatingIncome - AnnualDebtService",
+      "return_type": "currency",
+      "description": "Pre-tax cash flow = NOI - Debt Service"
+    },
+    {
+      "name": "CashOnCashReturn",
+      "type": "formula",
+      "formula": "IF(DownPayment > 0, ROUND(AnnualCashFlow / DownPayment * 100, 2), 0)",
+      "return_type": "percent",
+      "description": "Cash-on-Cash = Annual Cash Flow / Down Payment × 100. Target >8%"
+    },
+    {
+      "name": "DSCR",
+      "type": "formula",
+      "formula": "IF(AnnualDebtService > 0, ROUND(NetOperatingIncome / AnnualDebtService, 2), 0)",
+      "return_type": "number",
+      "description": "Debt Service Coverage Ratio = NOI / Annual Debt. Lenders require >1.25"
+    },
+    {
+      "name": "AssessedValue",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "NYC DOF assessed value (from PLUTO data)"
+    },
+    {
+      "name": "AssessedValueRatio",
+      "type": "formula",
+      "formula": "IF(AssessedValue > 0, ROUND(CurrentPrice / AssessedValue, 2), 0)",
+      "return_type": "number",
+      "description": "Market Value / Assessed Value. NYC target 45-100%; low AVR signals undervaluation"
+    },
+    {
+      "name": "HistoricalPPSF_1YrAvg",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Average PPSF from sales 1 year ago (from HistoricalSales rollup)"
+    },
+    {
+      "name": "HistoricalPPSF_3YrAvg",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Average PPSF from sales 3 years ago"
+    },
+    {
+      "name": "HistoricalPPSF_5YrAvg",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Average PPSF from sales 5 years ago"
+    },
+    {
+      "name": "PPSFChange1Yr",
+      "type": "formula",
+      "formula": "IF(HistoricalPPSF_1YrAvg > 0, ROUND((PricePerSQFT - HistoricalPPSF_1YrAvg) / HistoricalPPSF_1YrAvg * 100, 2), 0)",
+      "return_type": "percent",
+      "description": "PPSF change vs 1 year ago"
+    },
+    {
+      "name": "PPSFChange5Yr",
+      "type": "formula",
+      "formula": "IF(HistoricalPPSF_5YrAvg > 0, ROUND((PricePerSQFT - HistoricalPPSF_5YrAvg) / HistoricalPPSF_5YrAvg * 100, 2), 0)",
+      "return_type": "percent",
+      "description": "PPSF change vs 5 year average"
+    },
+    {
+      "name": "PPSFTrendFlag",
+      "type": "formula",
+      "formula": "IF(PPSFChange5Yr < -5, 'Undervalued', IF(PPSFChange5Yr > 10, 'Overheated', 'Stable'))",
+      "return_type": "single_select",
+      "description": "Price trend indicator: Undervalued/Stable/Overheated"
+    },
+    {
+      "name": "InvestmentGrade",
+      "type": "formula",
+      "formula": "IF(AND(CapRate >= 4, GrossRentMultiplier <= 12, CashOnCashReturn >= 8, DSCR >= 1.25), 'A', IF(AND(CapRate >= 3, GrossRentMultiplier <= 15, CashOnCashReturn >= 5), 'B', IF(CapRate >= 2, 'C', 'D')))",
+      "return_type": "single_select",
+      "description": "Investment quality grade A-D based on key metrics"
+    },
+    {
+      "name": "ValueScore",
+      "type": "number",
+      "format": "integer",
+      "description": "0-100 value score computed by automation based on all investment metrics"
+    }
+  ],
+  "new_neighborhoods_fields": [
+    {
+      "name": "MedianCapRate",
+      "type": "percent",
+      "description": "Neighborhood median cap rate"
+    },
+    {
+      "name": "MedianGRM",
+      "type": "number",
+      "format": "decimal",
+      "description": "Neighborhood median gross rent multiplier"
+    },
+    {
+      "name": "PPSF_1YrAgo",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Median PPSF 1 year ago"
+    },
+    {
+      "name": "PPSF_3YrAgo",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Median PPSF 3 years ago"
+    },
+    {
+      "name": "PPSF_5YrAgo",
+      "type": "currency",
+      "currency": "USD",
+      "precision": 0,
+      "description": "Median PPSF 5 years ago"
+    },
+    {
+      "name": "PPSFTrend5Yr",
+      "type": "formula",
+      "formula": "IF(PPSF_5YrAgo > 0, ROUND((MedianPricePerSQFT - PPSF_5YrAgo) / PPSF_5YrAgo * 100, 2), 0)",
+      "return_type": "percent",
+      "description": "5-year PPSF appreciation trend"
+    }
+  ],
+  "new_views": [
+    {
+      "table": "Properties",
+      "name": "Top Investment Opportunities",
+      "type": "grid",
+      "filter": "AND(InvestmentGrade IN ('A', 'B'), Status = 'Active')",
+      "sort": [{"field": "ValueScore", "direction": "desc"}],
+      "description": "Best investment properties by grade and value score"
+    },
+    {
+      "table": "Properties",
+      "name": "High Cap Rate (>4%)",
+      "type": "grid",
+      "filter": "AND(CapRate >= 4, Status = 'Active')",
+      "sort": [{"field": "CapRate", "direction": "desc"}],
+      "description": "Properties with cap rates above 4%"
+    },
+    {
+      "table": "Properties",
+      "name": "Positive Cash Flow",
+      "type": "grid",
+      "filter": "AND(AnnualCashFlow > 0, Status = 'Active')",
+      "sort": [{"field": "CashOnCashReturn", "direction": "desc"}],
+      "description": "Properties with positive cash flow"
+    },
+    {
+      "table": "Properties",
+      "name": "Undervalued (PPSF Trend)",
+      "type": "grid",
+      "filter": "AND(PPSFTrendFlag = 'Undervalued', Status = 'Active')",
+      "sort": [{"field": "PPSFChange5Yr", "direction": "asc"}],
+      "description": "Properties priced below historical averages"
+    },
+    {
+      "table": "Properties",
+      "name": "Low GRM (<12x)",
+      "type": "grid",
+      "filter": "AND(GrossRentMultiplier < 12, GrossRentMultiplier > 0, Status = 'Active')",
+      "sort": [{"field": "GrossRentMultiplier", "direction": "asc"}],
+      "description": "Properties with favorable rent-to-price multiples"
+    }
+  ],
+  "thresholds": {
+    "manhattan": {
+      "cap_rate": {
+        "excellent": ">5%",
+        "good": "4-5%",
+        "fair": "3-4%",
+        "poor": "<3%"
+      },
+      "ppsf": {
+        "low": "<$1,800",
+        "median": "$1,800-$2,100",
+        "high": ">$2,100"
+      },
+      "grm": {
+        "excellent": "<10x",
+        "good": "10-12x",
+        "fair": "12-15x",
+        "poor": ">15x"
+      },
+      "cash_on_cash": {
+        "excellent": ">10%",
+        "good": "8-10%",
+        "fair": "5-8%",
+        "poor": "<5%"
+      },
+      "dscr": {
+        "excellent": ">1.5",
+        "good": "1.25-1.5",
+        "minimum": "1.25",
+        "poor": "<1.25"
+      }
+    },
+    "queens_lic": {
+      "cap_rate": {
+        "excellent": ">4.5%",
+        "good": "3.5-4.5%",
+        "fair": "2.5-3.5%",
+        "poor": "<2.5%"
+      },
+      "ppsf": {
+        "low": "<$1,100",
+        "median": "$1,100-$1,400",
+        "high": ">$1,400"
+      }
+    },
+    "brooklyn": {
+      "cap_rate": {
+        "excellent": ">4%",
+        "good": "3-4%",
+        "fair": "2-3%",
+        "poor": "<2%"
+      },
+      "ppsf": {
+        "low": "<$1,200",
+        "median": "$1,200-$1,600",
+        "high": ">$1,600"
+      }
+    }
+  }
+}

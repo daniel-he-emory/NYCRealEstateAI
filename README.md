@@ -58,6 +58,22 @@ NYCRealEstateAI/
 
 ## Key Features
 
+### Investment Valuation Metrics
+**Five priority metrics for Manhattan condo analysis:**
+1. **Cap Rate**: NOI / Price (NYC benchmark: 3-5%)
+2. **Price Per Sq Ft**: Size-adjusted valuation vs neighborhood medians
+3. **Gross Rent Multiplier**: Price / Annual Rent (ideal: 10-15x, lower = better)
+4. **Cash-on-Cash Return**: Annual cash flow / down payment (target: >8%)
+5. **Debt Service Coverage Ratio**: NOI / debt payments (lender minimum: 1.25x)
+
+**Investment Grade System**: Automatic A-D grading based on all metrics
+
+### Historical Trend Analysis
+- **PPSF Trend Tracking**: Compare current price to 1/3/5-year averages
+- **Value Signals**: "Undervalued" flags when >5% below historical avg
+- **Assessed Value Ratio**: Market price vs NYC DOF assessment
+- **Appreciation Analysis**: Track price changes since last sale (ACRIS data)
+
 ### Intelligent Ranking
 Properties scored on a 0-100 scale considering:
 - **Price Match** (40 pts): How close to buyer's budget
@@ -77,8 +93,9 @@ Every property includes:
 - Rent-to-price ratio vs neighborhood average
 - Price per sqft vs comparables
 - HOA cost evaluation
-- Historical pricing trends
+- Historical pricing trends (ACRIS-powered)
 - Recent comparable sales
+- Assessed value analysis (PLUTO data)
 
 ## Target Markets
 
@@ -111,12 +128,24 @@ See `docs/IMPLEMENTATION.md` for detailed setup instructions.
 5. Highlights motivated sellers with price cuts
 6. Provides market context (is this a good deal?)
 
+## Data Sources
+
+**NYC Open Data Integration:**
+- **ACRIS** (Automated City Register Information System): Historical sales records 1966-present
+- **PLUTO** (Primary Land Use Tax Lot Output): Property assessments, sq ft, year built
+- **DOF Annualized Sales**: Quarterly median sales by neighborhood/zip
+- **StreetEasy Market Reports**: Rental market data and trends
+
+All data sources are free and publicly available.
+
 ## Documentation
 
 - [Airtable Schema](schemas/airtable-schema.json)
+- [Investment Metrics Guide](docs/INVESTMENT_METRICS.md) ⭐ **NEW**
 - [Implementation Guide](docs/IMPLEMENTATION.md)
 - [Formula Reference](docs/FORMULAS.md)
-- [API Integration](docs/API.md)
+- [OpenAI Parser](docs/OPENAI_PARSER.md)
+- [UI/UX Design](docs/UI_UX_DESIGN.md)
 
 ## License
 

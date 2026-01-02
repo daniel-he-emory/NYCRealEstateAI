@@ -13,8 +13,12 @@ beautifulsoup4>=4.12.0
 # Environment variable management
 python-dotenv>=1.0.0
 
-# Data manipulation (optional but useful)
+# Data manipulation
 pandas>=2.0.0
+numpy>=1.24.0
+
+# NYC Open Data API access (ACRIS, PLUTO)
+sodapy>=2.2.0
 
 # For API development (if building custom backend)
 flask>=3.0.0
