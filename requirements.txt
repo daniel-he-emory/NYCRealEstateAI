@@ -1,10 +1,11 @@
-# Core dependencies for NYC Real Estate AI
+# NYC Real Estate AI - Python Dependencies
 
-# OpenAI API for natural language processing
-openai>=1.0.0
+# Core AI/ML
+google-generativeai>=0.8.0  # Gemini Flash for property data extraction
 
-# Airtable API client
-pyairtable>=2.1.0
+# Database
+supabase>=2.27.0  # Supabase PostgreSQL client
+psycopg2-binary>=2.9.0  # PostgreSQL adapter (for direct SQL if needed)
 
 # Web scraping and HTTP requests
 requests>=2.31.0
@@ -23,6 +24,11 @@ sodapy>=2.2.0
 # Excel file parsing (DOF Rolling Sales)
 openpyxl>=3.1.0
 
-# For API development (if building custom backend)
-flask>=3.0.0
-flask-cors>=4.0.0
+# Web UI
+streamlit>=1.52.0
+
+# Legacy OpenAI support (optional, if needed)
+# openai>=1.0.0
+
+# Legacy Airtable support (optional, for migration)
+# pyairtable>=2.1.0
