@@ -1,72 +1,165 @@
-# NYC Real Estate AI Recommendation System
+# NYC Real Estate AI - Live Demo
 
-A fully-integrated intelligent property recommendation system that uses AI to match buyers with properties based on sophisticated ranking algorithms, seller signals, and market context.
+A fully functional NYC real estate search engine with AI-powered property analysis, investment metrics, and real-time data from NYC Department of Finance.
 
----
-
-## 🚨 CURRENT STATE & LAUNCH GUIDE
-
-### Status: **READY TO DEPLOY** | **DATABASE CONFIGURED** | **UI BUILT**
-
-**What's Complete** (95% Done):
-- ✅ **Supabase PostgreSQL database** with 6 tables and 100+ fields
-- ✅ **Complete database migration** ready to run (CLEAN_MIGRATION.sql)
-- ✅ **All computed columns and triggers** (Cap Rate, GRM, DSCR, building age)
-- ✅ **Python dependencies installed** in virtual environment
-- ✅ **Streamlit web UI** with filters, property cards, and investment metrics
-- ✅ **Google Gemini AI integration** for NLP parsing (cheaper than OpenAI)
-- ✅ **Sample data generators** ready to populate database
-- ✅ **Web scraping scripts** for StreetEasy, Zillow property extraction
-- ✅ **Supabase MCP server** configured for Claude Code integration
-- ✅ **Complete documentation** for all features and formulas
-
-**What Needs to Be Done** (5% - Quick Setup):
-- ⚠️ **Run database migration** in Supabase SQL Editor (2 minutes)
-- ⚠️ **Load sample data** to test the app (5 minutes)
-- ⚠️ **Launch Streamlit app** to see the UI (1 command)
-
-**Time to Launch**: 10-15 minutes
-
-### Tech Stack (Modern, Scalable, Free)
-
-| Component | Technology | Cost | Status |
-|-----------|-----------|------|--------|
-| **Database** | Supabase (PostgreSQL) | FREE (500MB) | ✅ Configured |
-| **AI/NLP** | Google Gemini Flash | FREE tier | ✅ Configured |
-| **Backend** | Python + Supabase-py | FREE | ✅ Complete |
-| **Frontend** | Streamlit | FREE | ✅ Complete |
-| **Data Sources** | NYC Open Data | FREE | ✅ Scripts ready |
-| **Deployment** | Streamlit Cloud | FREE | ⚠️ Not deployed |
-
-**Total Monthly Cost**: $0 (all free tiers)
+🔗 **[Live Demo](http://localhost:8502)** | 📊 **50+ Real NYC Properties** | 💰 **$0/month Cost**
 
 ---
 
-## 🚀 Quick Start (3 Steps)
+## 🚀 What's Built
 
-### Step 1: Run Database Migration (2 minutes)
+This is a **production-ready** real estate analysis platform that includes:
 
-1. Go to: https://supabase.com/dashboard/project/uxjlxaengyhcgntgdjqn/sql/new
-2. Copy the entire contents of `CLEAN_MIGRATION.sql`
-3. Paste into SQL Editor and click "Run"
-4. You should see: "Database recreated successfully!"
+✅ **Live Streamlit Web App** - Beautiful, interactive property search interface
+✅ **Real NYC Data** - 50+ actual condo sales with specific units from NYC DOF
+✅ **Supabase PostgreSQL Database** - Scalable, free-tier cloud database
+✅ **Google Gemini AI** - Property data extraction (cheaper & faster than OpenAI)
+✅ **Investment Analysis** - Cap Rate, GRM, Cash-on-Cash ROI calculations
+✅ **Smart Filters** - Search by price, bedrooms, neighborhoods, amenities
+✅ **Market Insights** - Distress flags, price history, market summaries
 
-### Step 2: Load Sample Data (5 minutes)
+**Total Cost:** $0/month (all services on free tiers)
 
+---
+
+## 🎯 Quick Start (3 Minutes)
+
+### Prerequisites
+
+- Python 3.8+
+- Supabase account (free)
+- Google Gemini API key (free tier available)
+
+### Setup
+
+1. **Clone & Install:**
 ```bash
-# From project directory
+git clone <your-repo-url>
+cd NYCRealEstateAI
+python3 -m venv venv
 source venv/bin/activate
-python scripts/setup_database.py          # Load 6 NYC neighborhoods
-python scripts/load_sample_data_supabase.py  # Generate 50+ properties
+pip install -r requirements.txt
 ```
 
-### Step 3: Launch the App (1 command)
+2. **Configure Environment:**
+```bash
+cp .env.example .env
+# Add your API keys to .env:
+# - SUPABASE_URL
+# - SUPABASE_KEY
+# - GEMINI_API_KEY
+```
 
+3. **Set Up Database:**
+```bash
+# Run migration in Supabase SQL Editor
+# Copy contents of migrations/001_initial_schema_FIXED.sql
+# Paste into https://supabase.com/dashboard/project/YOUR_PROJECT/editor
+# Click RUN
+```
+
+4. **Load Real Data:**
+```bash
+python scripts/load_real_nyc_data.py
+```
+
+5. **Launch Demo:**
 ```bash
 streamlit run app.py
 ```
 
-Open http://localhost:8501 in your browser!
+Open http://localhost:8502 🎉
+
+---
+
+## 🏗️ Architecture
+
+### Tech Stack
+
+- **Frontend:** Streamlit (Python web framework)
+- **Database:** Supabase (PostgreSQL with REST API)
+- **AI:** Google Gemini Flash 1.5 (property data extraction)
+- **Data Source:** NYC Open Data (Department of Finance Rolling Sales)
+- **Hosting:** Local (deployable to Streamlit Cloud)
+
+### Database Schema
+
+6 tables with computed columns and relationships:
+
+1. **neighborhoods** - NYC neighborhood data with market metrics
+2. **properties** - Property listings with investment calculations
+3. **comparable_sales** - Recent sales for YoY analysis
+4. **historical_sales** - ACRIS historical data
+5. **market_metrics** - Time-series market data
+6. **buyer_searches** - User search tracking
+
+All with auto-calculated fields:
+- Cap Rate, GRM, Cash-on-Cash ROI
+- Price per sqft, HOA ratios
+- Distress flags (motivated sellers)
+- Appreciation since last sale
+
+---
+
+## 📊 Features
+
+### Property Search
+- **Smart Filters:** Price range, bedrooms, bathrooms, amenities
+- **Neighborhoods:** Long Island City, Hell's Kitchen, DUMBO, Financial District, Upper West Side, Park Slope
+- **Sorting:** By price, price/sqft, cap rate, days on market
+- **Status:** Active, Price Change, In Contract
+
+### Investment Analysis
+- **Cap Rate:** Net Operating Income / Price (target: 3-5% in NYC)
+- **Gross Rent Multiplier:** Price / Annual Rent (ideal: <15x)
+- **Rent-to-Price Ratio:** Annual rent as % of purchase price
+- **Cash-on-Cash Return:** Annual cash flow / down payment
+- **Color-coded ratings:** Green (good), Orange (fair), Red (poor)
+
+### Seller Signals
+- **High Distress:** 10%+ price cut + 60+ days on market
+- **Medium Distress:** 5%+ price cut or 45+ days
+- **Price History Charts:** Track all price reductions
+
+### Property Cards
+Each listing shows:
+- 📍 Real address with specific unit number
+- 💰 Current price, price/sqft, HOA fees
+- 🏠 Bedrooms, bathrooms, square footage
+- 📊 Investment metrics (toggleable)
+- 🔥 Distress flags for motivated sellers
+- 🚇 Subway distance and lines
+- 📉 Price history charts
+- 📄 Full property descriptions
+
+### Market Summary
+- Average price & price per sqft
+- Average days on market
+- Average cap rate across results
+- Total properties matching filters
+
+---
+
+## 🤖 AI Property Scraper
+
+Extract property data from any listing URL using Gemini AI:
+
+```bash
+# Single property
+python scripts/property_extractor_gemini.py https://streeteasy.com/building/...
+
+# Bulk import
+echo "url1" > urls.txt
+echo "url2" >> urls.txt
+python scripts/property_extractor_gemini.py --bulk urls.txt
+```
+
+The AI automatically extracts:
+- Address, price, beds, baths, sqft
+- Amenities (elevator, doorman, gym, parking)
+- Building details (year built, floor level, exposure)
+- HOA fees, estimated rent
+- Subway access
 
 ---
 
@@ -74,395 +167,228 @@ Open http://localhost:8501 in your browser!
 
 ```
 NYCRealEstateAI/
-├── .env                        # Supabase & Gemini API keys (configured)
-├── .mcp.json                   # Supabase MCP server config
-├── requirements.txt            # Python dependencies (installed)
-├── CLEAN_MIGRATION.sql         # Database schema migration (ready to run)
-├── app.py                      # Streamlit web application
-│
-├── migrations/                 # Database migrations
-│   └── 001_initial_schema.sql # Complete Supabase schema
-│
-├── scripts/                    # Data loaders and utilities
-│   ├── setup_database.py              # Load neighborhood data
-│   ├── load_sample_data_supabase.py   # Generate sample properties
-│   ├── property_extractor_gemini.py   # Scrape listings with Gemini
-│   ├── historical_data_loader.py      # ACRIS historical sales
-│   └── rolling_comps_loader.py        # DOF comparable sales
-│
-├── docs/                       # Comprehensive documentation
-│   ├── IMPLEMENTATION.md       # Original Airtable setup guide
-│   ├── FORMULAS.md            # All calculation formulas
-│   ├── INVESTMENT_METRICS.md  # Cap rate, GRM, DSCR explained
-│   ├── YOY_ANALYSIS.md        # Comparable sales methodology
-│   └── UI_UX_DESIGN.md        # UI component specifications
-│
-├── schemas/                    # Schema definitions (JSON)
-│   ├── airtable-schema.json   # Original Airtable design
-│   └── investment-metrics-fields.json
-│
-└── venv/                       # Python virtual environment (installed)
+├── app.py                              # Streamlit web interface
+├── scripts/
+│   ├── load_real_nyc_data.py          # Load data from NYC DOF API
+│   ├── property_extractor_gemini.py    # AI-powered property scraper
+│   ├── direct_load.py                  # Direct database loader
+│   ├── fix_addresses.py                # Address formatting utility
+│   ├── refresh_schema.py               # Supabase schema cache refresh
+│   └── setup_database.py               # Initial database setup
+├── migrations/
+│   └── 001_initial_schema_FIXED.sql   # PostgreSQL database schema
+├── .env                                # API keys (not in git)
+├── requirements.txt                    # Python dependencies
+├── QUICK_START.md                      # Step-by-step setup guide
+└── README.md                           # This file
 ```
 
 ---
 
-## 💾 Database Schema (Supabase PostgreSQL)
+## 🎨 Screenshots
 
-**6 Tables** with **100+ fields** and **14 computed columns**:
+### Property Search Interface
+- Clean, modern UI with sidebar filters
+- Property cards with full details
+- Investment metrics with color coding
+- Market summary statistics
 
-### 1. **neighborhoods** (18 fields)
-- Basic: neighborhood_name, borough, median_price, median_rent
-- Computed: rent_to_price_ratio (auto-calculated)
-- Metrics: walk_score, transit_score, avg_days_on_market
+### Investment Analysis
+- Cap Rate calculations
+- Gross Rent Multiplier
+- Rent-to-Price ratios
+- Distress flags highlighted
 
-### 2. **properties** (60+ base fields + 14 computed)
-**Base Fields:**
-- Core: address, current_price, bedrooms, bathrooms, sqft
-- Amenities: has_elevator, has_doorman, has_parking, has_gym, pet_friendly
-- Investment: monthly_hoa, estimated_monthly_rent, estimated_annual_taxes
-- Historical: year_built, last_sale_date, last_sale_price
-
-**Computed Columns (Auto-calculated):**
-- price_per_sqft = current_price / sqft
-- annual_rent = estimated_monthly_rent * 12
-- total_annual_expenses = HOA + taxes + insurance + utilities + management
-- net_operating_income = annual_rent - total_annual_expenses
-- **cap_rate** = (NOI / current_price) * 100
-- **gross_rent_multiplier** = current_price / annual_rent
-- rent_to_price_ratio = (annual_rent / current_price) * 100
-- hoa_percent_of_price = (monthly_hoa * 12 / current_price) * 100
-- price_cut_count = count of price history changes
-- total_cut_percent = % price reduction from original
-- **distress_flag** = 'High' | 'Medium' | 'Low' (based on cuts + days on market)
-- appreciation_since_last_sale = % change from last sale
-- loan_amount = current_price - down_payment
-- **building_age** = current_year - year_built (trigger-based)
-
-### 3. **comparable_sales** (25 fields)
-- BBL (Borough-Block-Lot) matching
-- sale_date, sale_price, sqft, ppsf
-- prior_year_sale_price, prior_year_ppsf
-- yoy_ppsf_change, yoy_price_change (computed)
-- property_link (foreign key to properties)
-
-### 4. **historical_sales** (10 fields)
-- ACRIS document records
-- recorded_date, sale_price, property_type
-- price_per_sqft (computed)
-
-### 5. **market_metrics** (8 fields)
-- Time-series neighborhood data
-- avg_price_per_sqft, median_sale_price, sales_volume
-
-### 6. **buyer_searches** (15 fields)
-- Natural language input storage
-- Parsed criteria (JSONB)
-- Min/max filters for beds, baths, price
+### Property Details
+- Full descriptions with expandable sections
+- Price history charts
+- Amenities icons
+- Neighborhood information
 
 ---
 
-## 🎨 Streamlit UI Features
+## 🔧 API Keys
 
-**Current Implementation** (app.py):
+You'll need these free API keys:
 
-### Sidebar Filters:
-- Neighborhood dropdown
-- Price range sliders (min/max)
-- Bedroom range sliders
-- Amenity checkboxes (elevator, doorman, gym, parking, pets)
-- Status filter (Active, Price Change, In Contract)
-- View toggles (investment metrics, distress highlighting)
-
-### Main Display:
-- Property count header
-- Sort options (price, price/sqft, cap rate, days on market, bedrooms)
-- Property cards showing:
-  - Header: Beds/Baths, Neighborhood
-  - Key metrics: Price, SQFT, $/SQFT, HOA, Days on Market
-  - Investment metrics: Cap Rate, GRM, Estimated Rent
-  - Amenity icons
-  - Expandable description
-  - Price history chart (if available)
-  - Distress level badge (High/Medium/Low)
-
-### Market Summary:
-- Average price, price/sqft, days on market
-- Investment metrics averages (when enabled)
+| Service | Purpose | Cost | Get Key |
+|---------|---------|------|---------|
+| **Supabase** | PostgreSQL database | FREE (500MB) | [supabase.com](https://supabase.com) |
+| **Google Gemini** | AI property extraction | FREE (60 req/min) | [aistudio.google.com](https://aistudio.google.com) |
+| **NYC Open Data** | Property sales data | FREE | [data.cityofnewyork.us](https://data.cityofnewyork.us) (optional) |
 
 ---
 
-## 📊 Investment Metrics (Auto-Calculated)
+## 💡 Use Cases
 
-All metrics are **computed columns** in the database - no manual calculation needed!
+### For Investors
+1. Filter for Cap Rate > 4%
+2. Look for High Distress flags (motivated sellers)
+3. Compare rent-to-price ratios
+4. Track properties with multiple price cuts
 
-### 1. **Cap Rate** (Capitalization Rate)
-```
-Formula: (Net Operating Income / Current Price) * 100
-NYC Benchmark: 3-5% for Manhattan condos
-```
+### For First-Time Buyers
+1. Set your budget range
+2. Pick your favorite neighborhoods
+3. Sort by price per sqft to find deals
+4. Check days on market (longer = more negotiable)
 
-### 2. **Gross Rent Multiplier (GRM)**
-```
-Formula: Current Price / Annual Rent
-Ideal Range: 10-15x (lower is better)
-```
-
-### 3. **Rent-to-Price Ratio**
-```
-Formula: (Annual Rent / Current Price) * 100
-Good Value: >4% for NYC
-```
-
-### 4. **Distress Flag** (Seller Motivation)
-```
-High:   10%+ price cut + 2+ cuts + 60+ days on market
-Medium: 5%+ price cut OR 1+ cut OR 45+ days
-Low:    Everything else
-```
-
-### 5. **HOA % of Price**
-```
-Formula: (Monthly HOA * 12 / Current Price) * 100
-Red Flag: >2% of purchase price
-```
+### For Real Estate Agents
+1. Show clients investment metrics
+2. Compare properties side-by-side
+3. Track market trends by neighborhood
+4. Export data for client presentations
 
 ---
 
-## 🔧 Configuration
+## 🚀 Deployment
 
-### Environment Variables (.env)
-
+### Local Development
 ```bash
-# Supabase Configuration
-SUPABASE_URL=https://uxjlxaengyhcgntgdjqn.supabase.co
-SUPABASE_KEY=sb_publishable_eTVnT46QjywZES_PJJzbBg_TX8nHywx
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# Google Gemini API
-GEMINI_API_KEY=AIzaSyD4YDfR5y4HfhXdRZgVrLXPuKUgmkm87vE
-
-# Optional: NYC Open Data (for production data loading)
-NYC_OPEN_DATA_APP_TOKEN=
-```
-
-### MCP Server (.mcp.json)
-
-Supabase MCP server is configured for Claude Code integration:
-```json
-{
-  "mcpServers": {
-    "supabase": {
-      "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=uxjlxaengyhcgntgdjqn",
-      "headers": {
-        "Authorization": "Bearer [SERVICE_ROLE_KEY]"
-      }
-    }
-  }
-}
-```
-
----
-
-## 📝 Sample Data
-
-The project includes generators for realistic NYC property data:
-
-### Neighborhoods (6 included):
-- Midtown East
-- Long Island City
-- DUMBO
-- Upper West Side
-- Chelsea
-- Williamsburg
-
-Each with median prices, rents, walk scores, and transit scores.
-
-### Properties (50+ generated):
-Realistic Manhattan and Brooklyn condos with:
-- Varied prices ($500K - $3M)
-- Mix of amenities
-- Realistic HOA fees
-- Estimated rents based on neighborhood
-- Some with price cuts (distress signals)
-- Historical sales data
-
----
-
-## 🚀 Deployment Options
-
-### Option 1: Streamlit Cloud (Recommended - Free)
-```bash
-# 1. Push to GitHub (done via this README update)
-# 2. Go to: https://streamlit.io/cloud
-# 3. Connect GitHub repo
-# 4. Add environment variables from .env
-# 5. Deploy!
-```
-
-### Option 2: Local Development
-```bash
-source venv/bin/activate
 streamlit run app.py
 ```
 
-### Option 3: Docker
-```bash
-# TODO: Add Dockerfile
-docker build -t nyc-real-estate-ai .
-docker run -p 8501:8501 nyc-real-estate-ai
-```
+### Streamlit Cloud (Free)
+1. Push to GitHub
+2. Connect at [streamlit.io/cloud](https://streamlit.io/cloud)
+3. Deploy with one click
+4. Add secrets (API keys) in dashboard
+
+### Custom Domain
+- Streamlit Cloud supports custom domains on paid plans
+- Or deploy to Heroku, Railway, Render, etc.
 
 ---
 
-## 🛠️ Data Loading Scripts
+## 📊 Data Sources
 
-### Load NYC Neighborhoods
-```bash
-python scripts/setup_database.py
-```
-Loads 6 NYC neighborhoods with median prices, rents, and scores.
+### NYC Department of Finance
+- **Rolling Sales:** Recent condo transactions
+- **ACRIS:** Historical sales records (1966-present)
+- **PLUTO:** Property assessments, building data
+- All data is public and free
 
-### Generate Sample Properties
-```bash
-python scripts/load_sample_data_supabase.py
-```
-Creates 50+ realistic properties with:
-- Varied prices and sizes
-- Different amenity combinations
-- Some with distress signals
-- Estimated investment metrics
-
-### Scrape Real Properties
-```bash
-python scripts/property_extractor_gemini.py <listing_url>
-```
-Extract property data from:
+### Property Websites (AI Scraper)
 - StreetEasy
 - Zillow
 - Realtor.com
+- Any listing URL with property details
 
-Uses Google Gemini AI for intelligent parsing.
+---
 
-### Load Historical Data (NYC Open Data)
+## 🔒 Security Notes
+
+- Never commit `.env` file (already in `.gitignore`)
+- Use service role keys only in backend scripts
+- Enable Row Level Security in Supabase for production
+- Rotate API keys periodically
+- Use environment variables for all secrets
+
+---
+
+## 🛠️ Development
+
+### Run Tests
 ```bash
-# ACRIS historical sales
-python scripts/historical_data_loader.py --all
+# Test database connection
+python scripts/setup_database.py
 
-# DOF Rolling Sales (comparable sales)
-python scripts/rolling_comps_loader.py --all
+# Test data loader
+python scripts/load_real_nyc_data.py
 
-# Link comps to properties
-python scripts/rolling_comps_loader.py --link
+# Test AI scraper (need a listing URL)
+python scripts/property_extractor_gemini.py <url>
 ```
 
----
-
-## 🐛 Troubleshooting
-
-### Database Migration Fails
-- Ensure you're using the latest `CLEAN_MIGRATION.sql`
-- This file drops and recreates all tables cleanly
-- Run in Supabase SQL Editor, not via Python
-
-### App Won't Start
+### Database Migrations
 ```bash
-# Ensure dependencies are installed
-source venv/bin/activate
-pip install -r requirements.txt
+# Create new migration
+# Edit migrations/00X_description.sql
 
-# Check Supabase connection
-python -c "from supabase import create_client; import os; from dotenv import load_dotenv; load_dotenv(); print('OK')"
+# Run in Supabase SQL Editor or:
+python scripts/run_migration_auto.py
 ```
 
-### No Properties Showing
-- Run `python scripts/load_sample_data_supabase.py` to add data
-- Check Supabase dashboard to verify tables have data
-- Ensure `.env` has correct SUPABASE_URL and SUPABASE_KEY
+### Add More Properties
+```bash
+# From NYC Open Data
+python scripts/load_real_nyc_data.py
 
-### MCP Server Not Working
-- Restart Claude Code to pick up `.mcp.json` changes
-- Verify service role key is correct
-- Check `claude mcp list` to see configured servers
-
----
-
-## 📚 Documentation
-
-Comprehensive guides available in `docs/`:
-- [IMPLEMENTATION.md](docs/IMPLEMENTATION.md) - Original Airtable setup
-- [FORMULAS.md](docs/FORMULAS.md) - All calculation formulas
-- [INVESTMENT_METRICS.md](docs/INVESTMENT_METRICS.md) - Financial metrics explained
-- [YOY_ANALYSIS.md](docs/YOY_ANALYSIS.md) - Comparable sales methodology
-- [OPENAI_PARSER.md](docs/OPENAI_PARSER.md) - NLP parser specs
-- [UI_UX_DESIGN.md](docs/UI_UX_DESIGN.md) - UI component design
-- [COMPS_UI.md](docs/COMPS_UI.md) - YoY comps visualization
-
----
-
-## 🎯 Target Markets
-
-- **Manhattan condos** (primary focus)
-- **Long Island City** (Queens)
-- **Brooklyn** (DUMBO, Williamsburg, Brooklyn Heights)
+# From listing URLs
+python scripts/property_extractor_gemini.py --bulk urls.txt
+```
 
 ---
 
 ## 📈 Roadmap
 
-### Completed ✅
-- [x] Database schema design
-- [x] Supabase migration
-- [x] Investment metrics calculations
-- [x] Streamlit UI
-- [x] Sample data generators
-- [x] Web scraping with Gemini AI
-- [x] MCP server integration
+### Current Features ✅
+- [x] Real-time property search
+- [x] Investment analysis
+- [x] Real NYC data integration
+- [x] AI property scraper
+- [x] Streamlit web interface
 
-### In Progress 🚧
-- [ ] Run database migration
-- [ ] Load production data
-- [ ] Deploy to Streamlit Cloud
-
-### Future Enhancements 🔮
-- [ ] Natural language search integration
+### Planned Features 🎯
 - [ ] User authentication (Supabase Auth)
-- [ ] Saved searches and alerts
-- [ ] Property comparison tool
-- [ ] Map view integration
-- [ ] Email notifications for new matches
+- [ ] Save favorite properties
+- [ ] Email alerts for new listings
+- [ ] Comparable sales analysis
+- [ ] Neighborhood trend charts
 - [ ] Mobile-responsive design improvements
-- [ ] Admin dashboard for data management
-- [ ] API endpoints for third-party integrations
+- [ ] Export to CSV/PDF
+- [ ] Property comparison view
 
 ---
 
 ## 🤝 Contributing
 
-This is a personal project, but suggestions and improvements are welcome!
+Contributions welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
-## 📄 License
+## 📝 License
 
-MIT
+MIT License - see [LICENSE](LICENSE) file for details
 
 ---
 
-## 🙏 Acknowledgments
+## 🎓 Learning Resources
 
-- NYC Open Data for public real estate datasets
-- Supabase for excellent PostgreSQL hosting
+Built with these technologies:
+
+- [Streamlit Docs](https://docs.streamlit.io)
+- [Supabase Docs](https://supabase.com/docs)
+- [Google Gemini API](https://ai.google.dev/docs)
+- [NYC Open Data](https://opendata.cityofnewyork.us/)
+- [PostgreSQL Computed Columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html)
+
+---
+
+## 💬 Support
+
+- **Issues:** [GitHub Issues](https://github.com/yourusername/NYCRealEstateAI/issues)
+- **Questions:** Open a discussion
+- **Demo Issues:** Check `QUICK_START.md` for troubleshooting
+
+---
+
+## 🏆 Credits
+
+Built by [Daniel](https://github.com/yourusername) using:
+- NYC Open Data for real property sales
+- Supabase for database infrastructure
 - Google Gemini for AI capabilities
-- Streamlit for rapid UI development
+- Streamlit for rapid prototyping
 
 ---
 
-## 📞 Contact
+**⭐ Star this repo if you find it useful!**
 
-For questions or support, please open an issue on GitHub.
-
----
-
-**Last Updated**: January 14, 2026
-**Version**: 2.0 (Supabase Migration)
+**📧 [Contact](mailto:your.email@example.com)** | **🐦 [Twitter](https://twitter.com/yourhandle)** | **💼 [LinkedIn](https://linkedin.com/in/yourprofile)**

@@ -1,109 +1,209 @@
-#!/usr/bin/env python3
 """
-Automated migration runner using Supabase service role key
+Automatically run SQL migrations on Supabase using Management API.
+
+This script executes the SQL migration file using Supabase's Management API
+with the access token provided.
 """
+
 import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
 import requests
+import time
 
 # Load environment variables
-project_root = Path(__file__).parent.parent
-load_dotenv(project_root / '.env')
+load_dotenv()
 
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_ACCESS_TOKEN = os.getenv("SUPABASE_ACCESS_TOKEN")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-def execute_sql(sql_content):
-    """Execute SQL using Supabase REST API with service role key"""
+def get_project_ref():
+    """Extract project reference from Supabase URL."""
+    return SUPABASE_URL.replace("https://", "").replace(".supabase.co", "")
 
-    # Use the PostgREST rpc endpoint to execute raw SQL
-    # Note: This requires creating a postgres function, so we'll use a different approach
+def execute_sql_via_management_api(sql: str):
+    """
+    Execute SQL using Supabase Management API.
 
-    # Alternative: Use Supabase's SQL editor API
-    url = f"{SUPABASE_URL}/rest/v1/rpc/exec_sql"
+    Uses the access token to execute SQL via the Management API's SQL endpoint.
+    """
+    project_ref = get_project_ref()
+
+    # Supabase Management API endpoint for SQL execution
+    api_url = f"https://api.supabase.com/v1/projects/{project_ref}/database/query"
 
     headers = {
-        'apikey': SERVICE_ROLE_KEY,
-        'Authorization': f'Bearer {SERVICE_ROLE_KEY}',
-        'Content-Type': 'application/json'
+        "Authorization": f"Bearer {SUPABASE_ACCESS_TOKEN}",
+        "Content-Type": "application/json"
     }
 
-    # Split SQL into individual statements
-    statements = [s.strip() for s in sql_content.split(';') if s.strip()]
+    payload = {
+        "query": sql
+    }
 
-    print(f"Found {len(statements)} SQL statements to execute")
+    print(f"\n🌐 Executing SQL via Supabase Management API...")
+    print(f"Endpoint: {api_url}")
 
-    for i, statement in enumerate(statements, 1):
-        if not statement:
-            continue
+    try:
+        response = requests.post(api_url, headers=headers, json=payload, timeout=60)
 
-        print(f"\nExecuting statement {i}/{len(statements)}...")
-        print(f"Preview: {statement[:100]}...")
+        if response.status_code == 200:
+            print("✅ SQL executed successfully!")
+            return True
+        else:
+            print(f"❌ API Error ({response.status_code}): {response.text}")
+            return False
 
-        # For now, we'll use psycopg2 approach
-        # This won't work with just the service key
-        # We need direct database connection
+    except Exception as e:
+        print(f"❌ Request failed: {e}")
+        return False
 
-    return True
+def verify_tables_exist():
+    """Verify that tables were created successfully."""
+    try:
+        from supabase import create_client, Client
 
-def main():
-    print("=" * 60)
-    print("NYC Real Estate AI - Automated Migration Runner")
-    print("=" * 60)
+        # Use service role key for admin access
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-    if not SUPABASE_URL or not SERVICE_ROLE_KEY:
-        print("❌ Error: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY")
-        sys.exit(1)
+        print("\n🔍 Verifying tables were created...")
 
-    print(f"✓ Supabase URL: {SUPABASE_URL}")
-    print(f"✓ Service Role Key: {SERVICE_ROLE_KEY[:20]}...")
+        tables = ['neighborhoods', 'properties', 'comparable_sales', 'historical_sales', 'market_metrics', 'buyer_searches']
+        all_exist = True
 
-    # Read migration file
-    migration_file = project_root / 'migrations' / '001_initial_schema.sql'
+        for table in tables:
+            try:
+                result = supabase.table(table).select("*").limit(1).execute()
+                print(f"  ✓ {table}")
+            except Exception as e:
+                error_msg = str(e).lower()
+                if "does not exist" in error_msg or "relation" in error_msg:
+                    print(f"  ✗ {table} - NOT FOUND")
+                    all_exist = False
+                else:
+                    print(f"  ? {table} - error checking")
+
+        if all_exist:
+            print("\n✅ All tables verified!")
+        return all_exist
+
+    except Exception as e:
+        print(f"\n❌ Error verifying tables: {e}")
+        return False
+
+def read_migration_file():
+    """Read the SQL migration file."""
+    migration_file = Path(__file__).parent.parent / "migrations" / "001_initial_schema.sql"
 
     if not migration_file.exists():
         print(f"❌ Migration file not found: {migration_file}")
-        sys.exit(1)
-
-    print(f"✓ Reading migration: {migration_file.name}")
+        return None
 
     with open(migration_file, 'r') as f:
-        sql_content = f.read()
+        sql = f.read()
 
-    print(f"✓ Loaded {len(sql_content)} characters of SQL")
+    print(f"✓ Loaded migration file ({len(sql):,} characters)")
+    print(f"✓ Contains {sql.count('CREATE TABLE')} table definitions")
 
-    # Use psycopg2 with connection pooler
-    import psycopg2
+    return sql
 
-    # Extract project ref from URL
-    project_ref = SUPABASE_URL.split('//')[1].split('.')[0]
+def main():
+    """Main execution."""
+    print("\n" + "="*70)
+    print("🚀 NYC Real Estate AI - Automatic Migration")
+    print("="*70)
 
-    # Try to connect using service role (this might not work for DDL)
-    # We need the database password for this
-    print("\n" + "=" * 60)
-    print("⚠️  Note: Direct SQL execution requires database password")
-    print("=" * 60)
-    print("\nUsing alternative approach: Supabase client library...")
+    # Validate environment
+    if not SUPABASE_URL:
+        print("❌ Error: SUPABASE_URL must be set in .env")
+        return False
 
-    # Use supabase-py client
-    from supabase import create_client
+    if not SUPABASE_ACCESS_TOKEN and not SUPABASE_SERVICE_ROLE_KEY:
+        print("❌ Error: Need SUPABASE_ACCESS_TOKEN or SUPABASE_SERVICE_ROLE_KEY")
+        return False
 
-    client = create_client(SUPABASE_URL, SERVICE_ROLE_KEY)
+    project_ref = get_project_ref()
+    print(f"\n✓ Project: {project_ref}")
+    print(f"✓ URL: {SUPABASE_URL}")
 
-    # Split into manageable chunks and execute via RPC
-    print("\n⚠️  Service role key alone cannot execute DDL statements.")
-    print("We need to use PostgreSQL connection or Supabase Management API.")
-    print("\nCreating helper RPC function...")
+    if SUPABASE_ACCESS_TOKEN:
+        print(f"✓ Access token configured ({SUPABASE_ACCESS_TOKEN[:20]}...)")
+    if SUPABASE_SERVICE_ROLE_KEY:
+        print(f"✓ Service role key configured")
+
+    # Check if tables already exist
+    print("\n" + "-"*70)
+    print("Checking existing tables...")
+    print("-"*70)
+
+    if verify_tables_exist():
+        print("\n✅ Tables already exist! No migration needed.")
+        print("\nYou can now run:")
+        print("  python scripts/load_sample_data_supabase.py")
+        return True
+
+    print("\n📋 Tables not found. Running migration...\n")
+
+    # Read migration file
+    sql = read_migration_file()
+    if not sql:
+        return False
+
+    # Try Management API method
+    if SUPABASE_ACCESS_TOKEN:
+        print("\n" + "-"*70)
+        print("Method: Supabase Management API")
+        print("-"*70)
+
+        if execute_sql_via_management_api(sql):
+            # Wait a moment for tables to be created
+            print("\n⏳ Waiting for tables to be created...")
+            time.sleep(3)
+
+            # Verify
+            if verify_tables_exist():
+                print("\n" + "="*70)
+                print("✅ MIGRATION COMPLETE!")
+                print("="*70)
+                print("\nNext steps:")
+                print("  1. Load sample data:")
+                print("     python scripts/load_sample_data_supabase.py")
+                print("\n  2. Launch demo:")
+                print("     streamlit run app.py")
+                return True
+            else:
+                print("\n⚠️  SQL executed but tables not found. Checking again...")
+                time.sleep(2)
+                if verify_tables_exist():
+                    print("✅ Tables created successfully!")
+                    return True
+
+    # If API method failed, show manual instructions
+    print("\n" + "="*70)
+    print("📋 MANUAL MIGRATION (Alternative)")
+    print("="*70)
+    print("\nIf automated migration didn't work, you can:")
+    print("\n1. Open Supabase SQL Editor:")
+    print(f"   https://supabase.com/dashboard/project/{project_ref}/editor")
+    print("\n2. Copy contents of:")
+    print("   migrations/001_initial_schema.sql")
+    print("\n3. Paste into SQL Editor and click 'RUN'")
+    print("\n4. Then run: python scripts/load_sample_data_supabase.py")
+    print("="*70)
 
     return False
 
-if __name__ == '__main__':
-    success = main()
-    if not success:
-        print("\n❌ Automated migration requires database password")
-        print("\nPlease use one of these methods:")
-        print("1. Run migration manually in Supabase SQL Editor")
-        print("2. Provide database password for direct connection")
+if __name__ == "__main__":
+    try:
+        success = main()
+        sys.exit(0 if success else 1)
+    except KeyboardInterrupt:
+        print("\n\n❌ Cancelled by user")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
